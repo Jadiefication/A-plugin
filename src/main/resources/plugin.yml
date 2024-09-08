@@ -1,0 +1,20 @@
+name: gui2
+version: "1.0-SNAPSHOT"
+main: src.net.jadiefication.gui.Gui
+api-version: "1.21"
+depend:
+  - UltimateAdvancementAPI
+
+commands:
+  lobby:
+    description: "Teleport to the lobby"
+    usage: "/lobby"
+    aliases: []
+    permission: gui2.lobby
+    permission-message: "You do not have permission to use this command"
+  staff:
+    description: "Puts you in staff mode"
+    usage: "/staff"
+    aliases: [ ]
+    permission: gui2.staffmode
+    permission-message: "You do not have permission to use this command"
