@@ -12,9 +12,9 @@ commands:
     aliases: []
     permission: gui2.lobby
     permission-message: "You do not have permission to use this command"
-  staff:
-    description: "Puts you in staff mode"
-    usage: "/staff"
+  survival:
+    description: "Teleport to the survival world"
+    usage: "/survival"
     aliases: [ ]
-    permission: gui2.staffmode
+    permission: gui2.survival
     permission-message: "You do not have permission to use this command"

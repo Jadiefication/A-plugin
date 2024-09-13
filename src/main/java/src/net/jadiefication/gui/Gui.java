@@ -14,18 +14,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.NotePlayEvent;
-import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import src.net.jadiefication.Commands.LobbyCommand;
-import src.net.jadiefication.Commands.StaffModeCommand;
+import src.net.jadiefication.Commands.SurvivalCommand;
 
-import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 public final class Gui extends JavaPlugin implements Listener {
 
@@ -84,11 +79,10 @@ public final class Gui extends JavaPlugin implements Listener {
         } else {
             getLogger().warning("Lobby command not found in plugin.yml");
         }
-
-        if (getCommand("staff") != null) {
-            Objects.requireNonNull(getCommand("staff")).setExecutor(new StaffModeCommand());
+        if (getCommand("survival") != null) {
+            Objects.requireNonNull(getCommand("survival")).setExecutor(new SurvivalCommand());
         } else {
-            getLogger().warning("Staff command not found in plugin.yml");
+            getLogger().warning("Survival command not found in plugin.yml");
         }
     }
 
@@ -101,22 +95,6 @@ public final class Gui extends JavaPlugin implements Listener {
             getLogger().info("Granted root advancement to " + player.getName());
         } else {
             getLogger().warning("AdvancementTab 'gui2' not found when player " + player.getName() + " joined.");
-        }
-    }
-
-    @EventHandler
-    public void onCommand(PlayerGameModeChangeEvent event) {
-        if (StaffModeCommand.isStaffMode(event.getPlayer())) {
-            Map<Map<UUID, Boolean>, Inventory> inventoryMap = StaffModeCommand.getPlayerInventory();
-
-            Inventory inventory = inventoryMap.get(Map.of(event.getPlayer().getUniqueId(), true));
-            int i = 0;
-            for (ItemStack item : inventory.getContents()) {
-                if (item != null) {
-                    event.getPlayer().getInventory().setItem(i, item);
-                    i++;
-                }
-            }
         }
     }
 
