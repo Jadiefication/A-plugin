@@ -1,132 +1,124 @@
-package src.net.jadiefication.gui;
+package src.net.jadiefication.gui
 
-import com.fren_gor.ultimateAdvancementAPI.AdvancementTab;
-import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI;
-import com.fren_gor.ultimateAdvancementAPI.advancement.Advancement;
-import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement;
-import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement;
-import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay;
-import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType;
-import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.data.type.NoteBlock;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.NotePlayEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.plugin.java.JavaPlugin;
-import src.net.jadiefication.Commands.LobbyCommand;
-import src.net.jadiefication.Commands.SurvivalCommand;
+import com.fren_gor.ultimateAdvancementAPI.UltimateAdvancementAPI
+import com.fren_gor.ultimateAdvancementAPI.advancement.Advancement
+import com.fren_gor.ultimateAdvancementAPI.advancement.BaseAdvancement
+import com.fren_gor.ultimateAdvancementAPI.advancement.RootAdvancement
+import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementDisplay
+import com.fren_gor.ultimateAdvancementAPI.advancement.display.AdvancementFrameType
+import org.bukkit.Bukkit
+import org.bukkit.Instrument
+import org.bukkit.Material
+import org.bukkit.block.data.type.NoteBlock
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.block.NotePlayEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.plugin.java.JavaPlugin
+import src.net.jadiefication.Commands.LobbyCommand
+import src.net.jadiefication.Commands.SurvivalCommand
+import java.util.*
 
-import java.util.Objects;
+class Gui: JavaPlugin(), Listener {
 
-public final class Gui extends JavaPlugin implements Listener {
+    private var api: UltimateAdvancementAPI = UltimateAdvancementAPI.getInstance(this)
 
-    private UltimateAdvancementAPI api;
+    override fun onEnable() {
+        Bukkit.getPluginManager().registerEvents(this, this)
+        registerAdvancements()
+        registerCommands()
+    }
 
-    @Override
-    public void onEnable() {
+    private fun registerAdvancements() {
+        val namespace = "gui2"
+        val advancementTab = api.createAdvancementTab(namespace)
+
+        val rootDisplay = AdvancementDisplay(
+            Material.NOTE_BLOCK, "We are the future",
+            AdvancementFrameType.CHALLENGE, true, true, 0f, 0f, "Join the server for the first time."
+        )
+
+        val texturePath = "textures/block/stone.png"
+        val rootKey = "globe_root"
+        val rootAdvancement = RootAdvancement(advancementTab, rootKey, rootDisplay, texturePath)
+
         try {
-            getServer().getPluginManager().registerEvents(this, this);
-            api = UltimateAdvancementAPI.getInstance(this);
-            if (api == null) {
-                getLogger().severe("Failed to initialize UltimateAdvancementAPI. Make sure it's installed and loaded.");
-                Bukkit.getPluginManager().disablePlugin(this);
-                return;
-            }
-            registerAdvancement();
-            createCommands();
-        } catch (Exception e) {
-            getLogger().severe("Error during plugin initialization:");
-            e.printStackTrace();
-            Bukkit.getPluginManager().disablePlugin(this);
+            advancementTab.registerAdvancements(rootAdvancement)
+            logger.info("Root advancement registered successfully.")
+        } catch (e: Exception) {
+            logger.severe("Error registering RootAdvancement: " + e.message)
+            e.printStackTrace()
+            Bukkit.getPluginManager().disablePlugin(this)
         }
     }
 
-    private void registerAdvancement() {
-        String namespace = "gui2";
-        AdvancementTab advancementTab = api.createAdvancementTab(namespace);
-
-        AdvancementDisplay rootDisplay = new AdvancementDisplay(Material.NOTE_BLOCK, "We are the future",
-                AdvancementFrameType.CHALLENGE, true, true, 0, 0, "Join the server for the first time.");
-
-        String texturePath = "textures/block/stone.png";
-        String rootKey = "globe_root";
-        RootAdvancement rootAdvancement = new RootAdvancement(advancementTab, rootKey, rootDisplay, texturePath);
-
-        try {
-            advancementTab.registerAdvancements(rootAdvancement);
-            getLogger().info("Root advancement registered successfully.");
-        } catch (Exception e) {
-            getLogger().severe("Error registering RootAdvancement: " + e.getMessage());
-            e.printStackTrace();
-            Bukkit.getPluginManager().disablePlugin(this);
-        }
+    private fun createAdvancement(
+        icon: Material, key: String, displayName: String, description: String,
+        frameType: AdvancementFrameType, parent: Advancement
+    ): BaseAdvancement {
+        val display = AdvancementDisplay(
+            icon, displayName, frameType, true, true, 0f, 0f,
+            description
+        )
+        return BaseAdvancement(key, display, parent, 1)
     }
 
-    private BaseAdvancement createAdvancement(Material icon, String key, String displayName, String description,
-            AdvancementFrameType frameType, Advancement parent) {
-        AdvancementDisplay display = new AdvancementDisplay(icon, displayName, frameType, true, true, 0, 0,
-                description);
-        return new BaseAdvancement(key, display, parent, 1);
-    }
-
-    private void createCommands() {
+    private fun registerCommands() {
         if (getCommand("lobby") != null) {
-            Objects.requireNonNull(getCommand("lobby")).setExecutor(new LobbyCommand());
+            Objects.requireNonNull(getCommand("lobby"))?.setExecutor(LobbyCommand())
         } else {
-            getLogger().warning("Lobby command not found in plugin.yml");
+            logger.warning("Lobby command not found in plugin.yml")
         }
-        if (getCommand("survival") != null) {
-            Objects.requireNonNull(getCommand("survival")).setExecutor(new SurvivalCommand());
+        if (getCommand("survivallobby") != null) {
+            Objects.requireNonNull(getCommand("survivallobby"))?.setExecutor(SurvivalCommand())
         } else {
-            getLogger().warning("Survival command not found in plugin.yml");
+            logger.warning("Survival command not found in plugin.yml")
         }
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        AdvancementTab tab = api.getAdvancementTab("gui2");
+    fun onPlayerJoin(event: PlayerJoinEvent) {
+        val player = event.player
+        val tab = api.getAdvancementTab("gui2")
         if (tab != null) {
-            tab.getRootAdvancement().grant(player);
-            getLogger().info("Granted root advancement to " + player.getName());
+            if (!player.hasPlayedBefore()) {
+                tab.rootAdvancement.grant(player)
+                logger.info("Granted root advancement to " + player.name)
+            }
         } else {
-            getLogger().warning("AdvancementTab 'gui2' not found when player " + player.getName() + " joined.");
+            logger.warning("AdvancementTab 'gui2' not found when player " + player.name + " joined.")
         }
     }
 
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        Block block = event.getClickedBlock();
-        if (block != null && block.getType() == Material.NOTE_BLOCK) {
-            NoteBlock noteBlock = (NoteBlock) block.getBlockData();
-            if (noteBlock.getInstrument() == Instrument.PLING && noteBlock.getNote().getId() == 7) {
-                event.setCancelled(true);
-                Player player = event.getPlayer();
-                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "dm open signgui " + player.getName());
+    fun onPlayerInteract(event: PlayerInteractEvent) {
+        val block = event.clickedBlock
+        if (block != null && block.type == Material.NOTE_BLOCK) {
+            val noteBlock = block.blockData as NoteBlock
+            if (noteBlock.instrument == Instrument.PLING && noteBlock.note.id.toInt() == 7) {
+                event.isCancelled = true
+                val player = event.player
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), "dm open signgui " + player.name)
             }
         }
     }
 
     @EventHandler
-    public void onNotePlay(NotePlayEvent event) {
-        Block block = event.getBlock();
-        if (block.getType() == Material.NOTE_BLOCK) {
-            NoteBlock noteBlock = (NoteBlock) block.getBlockData();
-            if (noteBlock.getInstrument() == Instrument.PLING &&
-                    (noteBlock.getNote().getId() == 7 || noteBlock.getNote().getId() == 6)) {
-                event.setCancelled(true);
-                getLogger().info("Cancelled note change on PLING instrument");
+    fun onNotePlay(event: NotePlayEvent) {
+        val block = event.block
+        if (block.type == Material.NOTE_BLOCK) {
+            val noteBlock = block.blockData as NoteBlock
+            if (noteBlock.instrument == Instrument.PLING &&
+                (noteBlock.note.id.toInt() == 7 || noteBlock.note.id.toInt() == 6)
+            ) {
+                event.isCancelled = true
+                logger.info("Cancelled note change on PLING instrument")
             }
         }
     }
 
-
-    @Override
-    public void onDisable() {
-        // Plugin shutdown logic
+    override fun onDisable() {
+        Bukkit.getPluginManager().disablePlugin(this)
     }
 }
