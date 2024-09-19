@@ -4,17 +4,18 @@ main: src.net.jadiefication.gui.Gui
 api-version: "1.21"
 depend:
   - UltimateAdvancementAPI
+  - PlaceholderAPI
 
 commands:
   lobby:
     description: "Teleport to the lobby"
     usage: "/lobby"
-    aliases: []
+    aliases: [ "/l" ]
     permission: gui2.lobby
     permission-message: "You do not have permission to use this command"
   survivallobby:
     description: "Teleport to the survival world"
     usage: "/survivallobby"
-    aliases: [ ]
+    aliases: [ "/sl" ]
     permission: gui2.survival
     permission-message: "You do not have permission to use this command"
